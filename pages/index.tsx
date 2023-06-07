@@ -25,11 +25,8 @@ const Home = () => {
         body: JSON.stringify({ idMovie: id }),
       });
 
-      if (response.ok) {
-        const data = await response.json();
-        console.log("Data updated:", data);
-      } else {
-      }
+      const data = await response.json();
+      console.log("Data updated:", data);
     } catch (error) {
       console.error("Error:", error);
     }

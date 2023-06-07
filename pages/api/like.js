@@ -12,39 +12,15 @@ export default async function handler(req, res) {
 
     case "POST":
       // Traitement pour l'appel POST
-      const { movieId } = req.body;
+      const params = req.body;
       try {
         const client = await clientPromise;
-        const db = client.db("ws-data");
-
-        res.status(201).json({ message: "Movie created successfully", movie });
+        const db = client.db("ws-app");
+        await db.collection("movies").insertOne({ idMovie: idMovie });
+        res.status(200).json({ message: "Movie created successfully", movie });
       } catch (error) {
         res.status(500).json({ message: "Internal server error" });
       }
-
-      //   try {
-      //     try {
-      //       // Find the movie by ID and increment the likes count
-      //       const movie = await Movie.findByIdAndUpdate(
-      //         movieId,
-      //         { $inc: { likes: 1 } },
-      //         { new: true }
-      //       );
-
-      //       if (!movie) {
-      //         return res.status(404).json({ message: "Movie not found" });
-      //       }
-
-      //       res.status(200).json({ message: "Like added successfully", movie });
-      //     } catch (error) {
-      //       res.status(500).json({ message: "Internal server error" });
-      //     }
-
-      //     res.status(200).json({ message: "Like added successfully" });
-      //   } catch (error) {
-      //     res.status(500).json({ message: "Internal server error" });
-      //   }
-      res.status(200).json({ message: "POST request" });
       break;
     case "PUT":
       // Traitement pour l'appel PUT
