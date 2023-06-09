@@ -2,24 +2,53 @@ import clientPromise from "../../lib/mongodb";
 
 export default async function handler(req, res) {
   const { method } = req;
+  const params = req.body;
   switch (method) {
     case "GET":
-      //   const likes = await db.collection("likes").find({}).toArray();
+      try {
+        const client = await clientPromise;
+        const db = client.db("ws-app");
+        const params = req.query.id;
+        const existingData = await db
+          .collection("movies")
+          .findOne({ idMovie: params });
 
-      // Traitement pour l'appel GET
-      res.status(200).json({ message: "GET request" });
+        // Traitement pour l'appel GET
+        res.status(200).json({ message: "GET request", existingData });
+      } catch {
+        res
+          .status(500)
+          .json({ message: "Internal server error" + existingData });
+      }
       break;
 
     case "POST":
       // Traitement pour l'appel POST
-      const params = req.body;
+
       try {
         const client = await clientPromise;
         const db = client.db("ws-app");
-        await db.collection("movies").insertOne({ idMovie: idMovie });
-        res.status(200).json({ message: "Movie created successfully", movie });
+        const existingData = await db
+          .collection("movies")
+          .findOne({ idMovie: params.idMovie });
+        if (existingData) {
+          console.log("La donnée existe déjà :");
+          await db
+            .collection("movies")
+            .updateOne({ idMovie: params.idMovie }, { $inc: { like: 1 } });
+        } else {
+          await db
+            .collection("movies")
+            .insertOne({ idMovie: params.idMovie, like: 1 });
+        }
+        res.status(200).json({
+          message: "Movie created successfully",
+          existingData,
+        });
       } catch (error) {
-        res.status(500).json({ message: "Internal server error" });
+        res
+          .status(500)
+          .json({ message: "Internal server error" + existingData });
       }
       break;
     case "PUT":
@@ -35,5 +64,5 @@ export default async function handler(req, res) {
       break;
   }
 
-  res.json({ status: 200, data: likes });
+  res.json({ status: 200, data: null });
 }

@@ -9,12 +9,13 @@ const Home = () => {
       const response = await fetch("http://localhost:3000/api/discover");
       const data = await response.json();
       setMovies(data.movies);
+      return data.movies;
     } catch (error) {
       console.error("Error fetching movies:", error);
     }
   };
 
-  // PUT request
+  // POST request
   const addLike = async (id: string) => {
     try {
       const response = await fetch("http://localhost:3000/api/like", {
@@ -32,8 +33,28 @@ const Home = () => {
     }
   };
 
+  const getLike = async (id: string) => {
+    try {
+      const response = await fetch(`http://localhost:3000/api/like?id=${id}`, {
+        method: "GET",
+      });
+
+      const data = await response.json();
+      console.log("Get data:", data);
+      return data;
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+
   useEffect(() => {
-    fetchMovies().catch((error) => {});
+    fetchMovies()
+      .then((res) => {
+        res.forEach((item: any, index: any) => {
+          getLike(item.id).then();
+        });
+      })
+      .catch((error) => {});
   }, []);
 
   return (
