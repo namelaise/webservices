@@ -8,17 +8,12 @@ export default async function handler(req, res) {
       try {
         const client = await clientPromise;
         const db = client.db("ws-app");
-        const params = req.query.id;
-        const existingData = await db
-          .collection("movies")
-          .findOne({ idMovie: params });
-
-        // Traitement pour l'appel GET
-        res.status(200).json({ message: "GET request", existingData });
-      } catch {
-        res
-          .status(500)
-          .json({ message: "Internal server error" + existingData });
+        const existingData = await db.collection("movies").find({}).toArray();
+        const responseData = { message: "Requête GET", existingData };
+        res.status(200).json(responseData);
+      } catch (error) {
+        const errorMessage = "Erreur interne du serveur" + error;
+        res.status(500).json({ message: errorMessage });
       }
       break;
 
